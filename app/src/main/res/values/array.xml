@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="card_set_values">
+        <item>Set</item>
+        <item>15th Anniversary</item>
+        <item>Alara Reborn</item>
+        <item>Alliances</item>
+        <item>By color</item>
+    </string-array>
+
+    <string-array name="mana_color_values">
+        <item>Mana Color</item>
+        <item>white</item>
+        <item>blue</item>
+        <item>black</item>
+        <item>green</item>
+        <item>red</item>
+    </string-array>
+
+    <string-array name="rarity_values">
+        <item>Rarity</item>
+        <item>common</item>
+        <item>uncommon</item>
+        <item>rare</item>
+        <item>mythic rare</item>
+        <item>timeshifted</item>
+    </string-array>
+
+    <string-array name="card_type_values">
+        <item>Type</item>
+        <item>creature</item>
+        <item>enchantment</item>
+        <item>artifact</item>
+        <item>ritual</item>
+        <item>instant</item>
+    </string-array>
+
+
+</resources>

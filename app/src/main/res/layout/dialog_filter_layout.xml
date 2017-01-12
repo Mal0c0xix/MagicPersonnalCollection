@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/search_card_spinner_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/dialog_spinner_layout_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal">
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_card_rarity_spinner"
+            android:entries="@array/rarity_values" />
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_card_color_spinner"
+            android:entries="@array/mana_color_values" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/dialog_spinner_layout_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/mana_image_size"
+        android:layout_below="@id/dialog_spinner_layout_1">
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_card_set_spinner"
+            android:prompt="@string/spinner_sets_label"
+            android:entries="@array/card_set_values" />
+
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_card_type_spinner"
+            android:prompt="@string/spinner_types_label"
+            android:entries="@array/card_type_values" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dialog_btn_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/mana_image_size"
+        android:layout_below="@id/dialog_spinner_layout_2"
+        android:layout_alignParentEnd="true"
+        android:text="@string/action_filter"
+        />
+
+
+</RelativeLayout>

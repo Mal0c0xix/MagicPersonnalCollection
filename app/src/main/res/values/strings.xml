@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">MTG Deck Constructor</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="deck_name">Deck\'s name</string>
+    <string name="deck_format">Deck\'s format</string>
+    <string name="mana_description">a mana color</string>
+    <string name="title_activity_deck_creation">DeckCreationActivity</string>
+    <string name="title_activity_search_card">SearchCard</string>
+    <string name="search_type_label">Search Type :</string>
+    <string name="search_tab_label">Search</string>
+    <string name="decks_tab_label">Decks</string>
+    <string name="card_set_label">Card set</string>
+    <string name="title_activity_main">Home</string>
+    <string name="search_hint">Enter a card name</string>
+    <string name="main_board">Main Board</string>
+    <string name="side_board">Side board</string>
+    <string name="menu_add_card">Add Card</string>
+    <string name="btn_text_create_deck">Create Deck</string>
+    <string name="title_activity_card_details">CardDetails</string>
+    <string name="card_image_description">The card image</string>
+    <string name="incolor_cost_label">an incolor cost</string>
+    <string name="mana_cost_label">mana cost</string>
+    <string name="card_name_label">Card Name</string>
+    <string name="card_type_label">Card Type</string>
+    <string name="searchContextMenu_1">Ajouter à un deck</string>
+    <string name="searchContextMenu_2">Voir le prix sur TCGPlayer.com</string>
+    <string name="action_filter">Filter</string>
+    <string name="spinner_sets_label">Sets</string>
+    <string name="spinner_types_label">Types</string>
+</resources>

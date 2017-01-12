@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="80dp"
+    android:gravity="center_vertical">
+
+
+    <TextView
+        android:id="@+id/deck_lv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:maxLength="200"
+        android:hint="@string/deck_name"/>
+
+    <TextView
+        android:id="@+id/deck_lv_format"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/deck_format"
+        android:layout_below="@id/deck_lv_name"/>
+
+    <LinearLayout
+        android:id="@+id/mana_image_layout"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true">
+
+        <ImageView
+            android:id="@+id/mana_color_img_white"
+            android:contentDescription="@string/mana_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/white_mana"
+            android:visibility="gone"/>
+
+
+        <ImageView
+            android:id="@+id/mana_color_img_blue"
+            android:contentDescription="@string/mana_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/blue_mana"
+            android:visibility="gone"/>
+
+
+        <ImageView
+            android:id="@+id/mana_color_img_black"
+            android:contentDescription="@string/mana_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/black_mana"
+            android:visibility="gone"/>
+
+
+        <ImageView
+            android:id="@+id/mana_color_img_red"
+            android:contentDescription="@string/mana_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/red_mana"
+            android:visibility="gone"/>
+
+
+        <ImageView
+            android:id="@+id/mana_color_img_green"
+            android:contentDescription="@string/mana_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/green_mana"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

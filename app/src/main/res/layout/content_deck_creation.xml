@@ -1,0 +1,72 @@
+<ScrollView
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+<LinearLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:paddingLeft="@dimen/text_margin"
+    android:paddingRight="@dimen/text_margin"
+    android:paddingBottom="@dimen/text_margin"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_deck_name"
+        android:hint="Enter the deck's name"
+        android:layout_marginTop="60dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/deck_name_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/mainboard_label"
+        android:text="@string/main_board"
+        android:layout_marginTop="@dimen/text_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <ListView
+        android:id="@+id/mainboard_lv"
+        android:layout_width="match_parent"
+        android:layout_height="225dp"
+        android:layout_marginTop="8dp">
+    </ListView>
+
+    <TextView
+        android:id="@+id/sideboard_label"
+        android:text="@string/side_board"
+        android:layout_marginTop="@dimen/text_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ListView
+        android:id="@+id/sideboard_lv"
+        android:layout_width="match_parent"
+        android:layout_height="225dp"
+        android:layout_marginTop="8dp">
+
+    </ListView>
+
+    <Button
+        android:id="@+id/deck_finish_creation_btn"
+        android:text="@string/btn_text_create_deck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="100dp"/>
+
+
+</LinearLayout>
+</ScrollView>
