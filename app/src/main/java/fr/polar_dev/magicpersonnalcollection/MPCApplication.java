@@ -3,6 +3,8 @@ package fr.polar_dev.magicpersonnalcollection;
 import android.app.Application;
 import android.content.Context;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -22,6 +24,7 @@ public class MPCApplication extends Application {
     }
 
     private RefWatcher refWatcher;
+    private RequestQueue requestQueue;
 
     @Override
     public void onCreate() {
@@ -33,5 +36,12 @@ public class MPCApplication extends Application {
         }
         refWatcher = LeakCanary.install(this);
         // Normal app init code...
+        requestQueue = Volley.newRequestQueue(this);
+    }
+
+    public static RequestQueue getRequestQueue(Context context)
+    {
+        MPCApplication application = (MPCApplication) context.getApplicationContext();
+        return application.requestQueue;
     }
 }

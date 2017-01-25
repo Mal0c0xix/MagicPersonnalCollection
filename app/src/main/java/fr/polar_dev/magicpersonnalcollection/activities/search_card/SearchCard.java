@@ -1,30 +1,22 @@
 package fr.polar_dev.magicpersonnalcollection.activities.search_card;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -35,8 +27,10 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.polar_dev.magicpersonnalcollection.MPCApplication;
 import fr.polar_dev.magicpersonnalcollection.R;
 import fr.polar_dev.magicpersonnalcollection.models.Card;
+import fr.polar_dev.magicpersonnalcollection.tools.CardApiUrlConstructor;
 import fr.polar_dev.magicpersonnalcollection.tools.EndlessScrollListener;
 import fr.polar_dev.magicpersonnalcollection.tools.ParseJSON;
 
@@ -55,7 +49,9 @@ public class SearchCard extends AppCompatActivity {
     private SearchCardAdapter adapter;
     private Card selectedCard;
     private boolean firstLoad = true;
+    private boolean filtering = false;
     private boolean result = true;
+    private CardApiUrlConstructor urlConstructor;
 
     @AfterViews
     void initialize()
@@ -65,13 +61,13 @@ public class SearchCard extends AppCompatActivity {
         adapter = new SearchCardAdapter(this, datas);
         search_card_lv.setAdapter(adapter);
 
-        search_card_lv.setOnScrollListener(new EndlessScrollListener() {
+        search_card_lv.setOnScrollListener(new EndlessScrollListener(5, 0) {
             @Override
             public boolean onLoadMore(int pageIndex, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to your AdapterView
+                // ONLY return true if more data is actually being loaded; false otherwise.
                 return loadNextDataFromApi(pageIndex,null);
-                // ONLY if more data is actually being loaded; false otherwise.
             }
         });
 
@@ -81,20 +77,24 @@ public class SearchCard extends AppCompatActivity {
     @Click(R.id.fab)
     void onFabClicked()
     {
-        Intent intent = new Intent();
-
-        intent.putExtra("board", "mainboard");
-        if(selectedCard != null)
+        if(selectedCard != null) {
+            Intent intent = new Intent();
+            intent.putExtra("board", "mainboard");
             intent.putExtra("chosenCard", selectedCard);
-        setResult(1, intent);
-        finish();
+            setResult(1, intent);
+            finish();
+        }
+        else
+        {
+            Toast.makeText(this, "No Card Selected ! Please select one before clicking this button !", Toast.LENGTH_LONG)
+            .show();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.menu_search_card, menu);
         return true;
     }
@@ -104,11 +104,7 @@ public class SearchCard extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if(id == R.id.action_settings)
-        {
-            return true;
-        }
-        else if(id == R.id.action_filter)
+        if(id == R.id.action_filter)
         {
             showSpinnerDialog();
         }
@@ -122,26 +118,18 @@ public class SearchCard extends AppCompatActivity {
         selectedCard = choosenCard;
     }
 
+    /**
+     * Send an http request using the Volley library
+     * @param selectedURL the url targeted by the request
+     * @return a boolean which is true if data is loaded, false otherwise.
+     */
     private boolean sendRequest(String selectedURL)
     {
         StringRequest stringRequest = new StringRequest(selectedURL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(!ParseJSON.jsonToCardList(response).isEmpty()) {
-
-                            if (!firstLoad)
-                                datas.addAll(ParseJSON.jsonToCardList(response));
-                            else {
-                                datas = ParseJSON.jsonToCardList(response);
-                                firstLoad = false;
-                            }
-                            adapter.notifyDataSetChanged();
-                        }
-                        else
-                        {
-                            result = false;
-                        }
+                        result = parseResponse(response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -151,24 +139,32 @@ public class SearchCard extends AppCompatActivity {
                     }
                 });
 
-        RequestQueue requestQueue = Volley.newRequestQueue(SearchCard.this);
-        requestQueue.add(stringRequest);
+        MPCApplication.getRequestQueue(this).add(stringRequest);
+        Log.d("Requestresult", String.valueOf(result));
         return result;
     }
 
-    // Append the next page of data into the adapter
-    // This method sends out a network request and appends new data items to your adapter.
+    /**
+     * This method sends out a network request and appends new data items to the adapter
+     * @param next_page_index an int representing the next page index
+     * @param args a string representing the arguments to add to the request
+     * @return a boolean which is true if data is loaded, false otherwise
+     */
     public boolean loadNextDataFromApi(int next_page_index, String args) {
 
         String next_page_url = BASE_URL;
         if(args != null && !args.isEmpty())
-            next_page_url += "?" + args;
-        next_page_url += "&page=" + next_page_index;
+            next_page_url += "?" + args + "&page=" + next_page_index;
+        else
+            next_page_url += "?page=" + next_page_index;
 
         return sendRequest(next_page_url);
 
     }
 
+    /**
+     * Show the dialog containing the spinners for filtering the list.
+     */
     private void showSpinnerDialog()
     {
         final Dialog dialog = new Dialog(this);
@@ -187,30 +183,68 @@ public class SearchCard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String requestArgs = "";
+                filtering = true;
+
                 String rarity = rarity_spinner.getSelectedItem().toString();
                 String set = set_spinner.getSelectedItem().toString();
                 String color = mana_spinner.getSelectedItem().toString();
                 String type = type_spinner.getSelectedItem().toString();
 
+                List<String> urlArgs = new ArrayList<>();
+
                 if(!rarity.equals("Rarity"))
-                    requestArgs += "?rarity=" + rarity;
+                    urlArgs.add("rarity=" + rarity);
 
                 if(!set.equals("Set"))
-                    requestArgs += "?set=" + set;
+                    urlArgs.add("set=" + set);
 
                 if(!color.equals("Mana Color"))
-                    requestArgs += "?color=" + color;
+                    urlArgs.add("color=" + color);
 
                 if(!type.equals("Type"))
-                    requestArgs += "?type=" + type;
+                    urlArgs.add("type=" + type);
 
-                sendRequest(BASE_URL+requestArgs);
+                urlConstructor = new CardApiUrlConstructor(BASE_URL, urlArgs);
+
+                sendRequest(urlConstructor.build());
 
                 dialog.dismiss();
+                filtering = false;
             }
         });
 
         dialog.show();
+    }
+
+    /**
+     * Parse the http response string and return a boolean to inform the user if data has been loaded or not
+     * @param response the http response in String format
+     * @return a boolean which is true if data is loaded, false otherwise.
+     */
+    private boolean parseResponse(String response)
+    {
+        boolean dataIsLoaded;
+
+        if(!ParseJSON.jsonToCardList(response).isEmpty()) {
+
+            if(firstLoad && !filtering)
+            {
+                firstLoad = false;
+                datas = ParseJSON.jsonToCardList(response);
+            }
+            else if(!firstLoad && filtering)
+            {
+                datas.addAll(ParseJSON.jsonToCardList(response));
+            }
+            adapter.notifyDataSetChanged();
+            Log.d("SearchCard", datas.toString());
+            dataIsLoaded = true;
+        }
+        else
+        {
+            dataIsLoaded = false;
+        }
+
+        return dataIsLoaded;
     }
 }

@@ -14,11 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.squareup.leakcanary.RefWatcher;
 
 import org.androidannotations.annotations.AfterViews;
@@ -49,10 +47,10 @@ import fr.polar_dev.magicpersonnalcollection.tools.ParseJSON;
 public class SearchTabFragment extends Fragment {
 
     @ViewById(R.id.search_tab_lv)
-    ListView search_listview;
+    ListView searchListView;
 
     private SearchCardAdapter adapter;
-    private List<Card> datas = new ArrayList<>();
+    private List<Card> cardsDataSet = new ArrayList<>();
 
     private static final String BASE_URL = "https://api.deckbrew.com/mtg/cards?page=";
 
@@ -73,10 +71,10 @@ public class SearchTabFragment extends Fragment {
     void initialize()
     {
 
-        adapter = new SearchCardAdapter(getActivity(), datas);
+        adapter = new SearchCardAdapter(getActivity(), cardsDataSet);
 
-        search_listview.setAdapter(adapter);
-        search_listview.setOnScrollListener(new EndlessScrollListener() {
+        searchListView.setAdapter(adapter);
+        searchListView.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int pageIndex, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
@@ -87,7 +85,7 @@ public class SearchTabFragment extends Fragment {
             }
         });
 
-        registerForContextMenu(search_listview);
+        registerForContextMenu(searchListView);
     }
 
     @ItemClick(R.id.search_tab_lv)
@@ -128,40 +126,31 @@ public class SearchTabFragment extends Fragment {
 
         if(item.getTitle().equals(getResources().getString(R.string.searchContextMenu_1)))
         {
-            Toast.makeText(getContext(), "Action 1", Toast.LENGTH_SHORT).show();
-            AlertDialog.Builder alertdialogbuilder = new AlertDialog.Builder(getContext());
-
-            alertdialogbuilder.setTitle("Select A Deck ");
+            Toast.makeText(getContext(), "Action 1", Toast.LENGTH_SHORT).show();;
 
             DeckDao deckDao = DaoFactory.getDeckDAO(getContext(), 1);
             final CardDao cardDao = DaoFactory.getCardDAO(getContext(), 1);
 
-            List<Deck> decksList = deckDao.getAllDecks();
+            List<Deck> decksList;
             final List<String> decksName = new ArrayList<>();
-            for(Deck d : decksList)
+
+            if (deckDao != null) {
+                decksList = deckDao.getAllDecks();
+                for(Deck d : decksList)
+                {
+                    decksName.add(d.getDeckName());
+                }
+            }
+            else
             {
-                decksName.add(d.getDeckName());
+                Toast.makeText(getContext(), "Erreur lors de l'accès à la base de données ! Veuillez relancer l'application !",
+                        Toast.LENGTH_LONG).show();
             }
 
             String[] nameArray = decksName.toArray(new String[decksName.size()]);
 
-            alertdialogbuilder.setItems(nameArray, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String selectedDeck = decksName.get(which);
+            showCardContextMenu(nameArray, decksName, info, cardDao);
 
-                    Card selectedCard = datas.get(info.position);
-                    List<Card> cards = new ArrayList<>();
-                    cards.add(selectedCard);
-
-                    cardDao.insertCardsInDeck(cards, selectedDeck);
-
-                }
-            });
-
-            AlertDialog dialog = alertdialogbuilder.create();
-
-            dialog.show();
         }
         else if(item.getTitle().equals(getResources().getString(R.string.searchContextMenu_2)))
         {
@@ -172,13 +161,50 @@ public class SearchTabFragment extends Fragment {
         return true;
     }
 
+    private void showCardContextMenu(String[] menuItemsArray, List<String> decksNames, AdapterView.AdapterContextMenuInfo info,
+                                     CardDao cDao)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+
+        final List<String> decks = decksNames;
+        final AdapterView.AdapterContextMenuInfo contextMenuInfo = info;
+        final CardDao cardDao = cDao;
+
+        alertDialogBuilder.setTitle("Select A Deck ");
+
+        alertDialogBuilder.setItems(menuItemsArray, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String selectedDeck = decks.get(which);
+
+                Card selectedCard = cardsDataSet.get(contextMenuInfo.position);
+                List<Card> cards = new ArrayList<>();
+                cards.add(selectedCard);
+
+                if (cardDao != null) {
+                    cardDao.insertCardsInDeck(cards, selectedDeck);
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "Erreur lors de l'accès à la base de données ! Veuillez relancer l'application !",
+                            Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        AlertDialog dialog = alertDialogBuilder.create();
+
+        dialog.show();
+    }
+
     private void sendRequest(String url)
     {
         StringRequest stringRequest = new StringRequest(url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        showJSON(response);
+                        parseHttpResponse(response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -188,12 +214,11 @@ public class SearchTabFragment extends Fragment {
                     }
                 });
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        requestQueue.add(stringRequest);
+        MPCApplication.getRequestQueue(getContext()).add(stringRequest);
     }
 
-    private void showJSON(String response) {
-        datas.addAll(ParseJSON.jsonToCardList(response));
+    private void parseHttpResponse(String response) {
+        cardsDataSet.addAll(ParseJSON.jsonToCardList(response));
         adapter.notifyDataSetChanged();
     }
 
